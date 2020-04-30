@@ -1,0 +1,54 @@
+---
+title: "Full list of Techniques and references"
+author: "Roel M. Hogervorst"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Full list of Techniques and references}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+GRIMMER
+- [PeerJ preprint](https://peerj.com/preprints/2400/) by Jordan Anaya 
+Anaya J. 2016. The GRIMMER test: A method for testing the validity of reported measures of variability. PeerJ Preprints 4:e2400v1 https://doi.org/10.7287/peerj.preprints.2400v1
+
+GRIM https://osf.io/t47wf/
+
+Heathers JA, Anaya J, van der Zee T, Brown NJ. 2018. Recovering data from summary statistics: Sample Parameter Reconstruction via Iterative TEchniques (SPRITE) PeerJ Preprints 6:e26968v1 https://doi.org/10.7287/peerj.preprints.26968v1
+Used the r implementation found on https://osf.io/scpbz/
+
+Anaya,  J.  (2016).  The  GRIMMER  test:  A  method  for  testing  the  validity  of  repeated  measures  of  variability.  PeerJ Preprints, 4, e2400v1.  
+
+Brown, N. J., & Heathers, J. A. (2017). The GRIM test: A simple technique detects numerous anomalies in the reporting of results in psychology. Social Psychological and Personality Science, 8(4), 363-369. 
+
+Brown, N. J., & Heathers, J. A. (2019). Rounded Input Variables, Exact Test Statistics (RIVETS): A technique for detecting hand-calculated results in published research. Unpublished paper. Bouve College of Health Sciences, Northeastern University, 360 Huntington Avenue, Boston, MA, USA 02115. 
+
+Heathers, J., Anaya, J., van der Zee, T., & Brown, N. J. L. (2018). Recovering data from summary statistics: Sample  parameter  reconstruction  via  iterative  techniques  (SPRITE).  Peerj  Preprints.  doi.org/10.7287/  peerj.preprints.26968v1. 
+
+Heathers, J. A., & Brown, N. J. (2019). DEBIT: A simple consistency test for binary data. Unpublished paper. Bouve College of Health Sciences, Northeastern University, 360 Huntington Avenue, Boston, MA. USA 02115. 
+
+
+
+---investigate:
+Nuijten, M. B., Hartgerink, C. H., van Assen, M. A., Epskamp, S., and Wicherts, J. M. (2016). The prevalence of statistical
+reporting errors in psychology (1985–2013). Behavior research methods, 48(4):1205–1226.
+
+Simonsohn, U. (2013). Just post it: The lesson from two cases of fabricated data detected by statistics alone. Psychological
+science, 24(10):1875–1888.
+
+Veldkamp, C. L., Nuijten, M. B., Dominguez-Alvarez, L., van Assen, M. A., and Wicherts, J. M. (2014). Statistical
+reporting errors and collaboration on statistical analyses in psychological science. PloS one, 9(12):e114876.
+
+
+Wilner, S., Wood, K., and Simons, D. (2018). Complete recovery of values in diophantine systems (corvids). PsyArXiv. Wolins, L. (1962). Responsibility for raw data. American Psychologist, 17(9):657–658.
+https://github.com/katherinemwood/corvids
+https://katherinemwood.github.io/post/corvids/
