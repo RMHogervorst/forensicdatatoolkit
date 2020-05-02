@@ -1,5 +1,4 @@
 test_that("Seek vector works", {
-  set.seed(1224)
   mean_here <- 3.533
   sd_here <- 1.561
   n <- 45
@@ -10,19 +9,10 @@ test_that("Seek vector works", {
 })
 
 test_that("get sample creates correct samples", {
-  set.seed(1233)
-  N <- 10
-  tMean <- 3.5
-  tSD <- 1.561
-  dp <- 2
-  max_cases <- 10
-  samples <- get_samples(max_cases = max_cases, n = N, mean = tMean, sd = tSD, scale_min = 1, scale_max = 7, dp = 2)
-  expect_equal(nrow(samples), max_cases)
-  expect_equal(ncol(samples), N)
-  expect_equal(samples[1, ], c(1, 3, 3, 3, 3, 4, 4, 4, 4, 6))
-  set.seed(1234)
-  # using example from shiny app
+  # using example from original shiny app
   samples_shiny <- get_samples(max_cases = 9, n = 45, mean = 3.533, sd = 1.561, scale_min = 1, scale_max = 7, dp = 3, fixed = c())
   expect_true(all(round(apply(samples_shiny, 1, mean), 3) == 3.533))
   expect_true(all(round(apply(samples_shiny, 1, sd), 3) == 1.561))
+  expect_equal(nrow(samples_shiny), 9)
+  expect_equal(ncol(samples_shiny), 45)
 })

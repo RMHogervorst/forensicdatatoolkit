@@ -21,6 +21,25 @@ test_that("mean bumping works", {
   )
 })
 
+test_that("extensive testing makes mean work",{
+  m = 7.5
+  max_ =14
+  min_ =1
+  for (i in 1:10) {
+    vec <- create_init_vec(n=10, m+1,scale_min = min_,scale_max =  max_)
+    result <- loop_until_mean_is_ok(vec,m,scale_min = min_,scale_max = max_, dp = 2,fixed = c())
+    expect_equivalent(mean(result), m, tolerance=5e-3)
+  }
+
+})
+
+test_that("minimal functionality of init vec works",{
+  result <- create_init_vec(10, 3, scale_min=1, scale_max=10)
+  expect_equal(length(result),10)
+  expect_true(all(result <=10))
+  expect_true(all(result >=1))
+})
+
 test_that("make_mean_grim works", {
   expect_equal(make_mean_grim(mean = 2.5, n = 4, dp = 2), 2.5)
   expect_warning((test_result <- make_mean_grim(mean = 2.5, n = 3, dp = 2)),
@@ -78,6 +97,8 @@ test_that("determine_positions with decrease sd decreases sd", {
   expect_equal(mean(decrease), mean(vec))
   expect_true(sd(vec) > sd(decrease))
 })
+
+### constant values for some tests
 vec <- c(1, 1, 3, 3, 2, 2, 2, 6)
 tMean <- 2.5
 tSD <- 1.195
@@ -88,7 +109,6 @@ fixed <- c()
 
 test_that("specific determine_positions works just as rsprite delta", {
   result <- determine_positions(increaseSD = FALSE, delta = 1, vec = vec, fixed = fixed, scale_min = scaleMin, scale_max = scaleMax)
-  # there was only one left
   expect_true(result$incr %in% c(1,3,5))
   expect_true(result$decr %in% c(3,5,8))
   result2 <- determine_positions(increaseSD = TRUE, delta = 1, vec = vec, fixed = fixed, scale_min = scaleMin, scale_max = scaleMax)
@@ -104,6 +124,23 @@ test_that("loop until sd is ok works", {
     dp = dp
   )
   expect_equivalent(sd(vec), tSD, tolerance = 5e-3)
+  expect_equivalent(mean(vec), tMean, tolerance = 5e-3)
+})
+
+test_that("loop sd does not change the mean value",{
+  m = 8
+  s=3.83
+  max_ =15
+  min_ =1
+  dp =2
+  fixed <- c()
+  for (i in 1:5) {
+    vec <- create_init_vec(n=10, m+1,scale_min = min_,scale_max =  max_)
+    vec <- loop_until_mean_is_ok(vec,m,scale_min = min_,scale_max = max_, dp = dp,fixed = fixed)
+    result <- loop_until_sd_is_ok(vec,m,s,min_,max_,dp = dp,fixed = fixed)
+    expect_equivalent(mean(result), m, tolerance=5e-3)
+    expect_equivalent(sd(result), s, tolerance=5e-3)
+  }
 })
 
 test_that("determine_positions deals with weird values", {
@@ -138,8 +175,16 @@ test_that("determine_positions deals with weird values", {
 })
 
 
-
 test_that("increment works", {
   expect_equal(increment(c(1, 2, 3, 4), 2, 2), c(1, 4, 3, 4))
   expect_equal(increment(c(1, 2, 3, 4), 4, -2), c(1, 2, 3, 2))
+  vec <- vec2 <- 1:5
+  whichWillDec =2
+  whichWillInc =5
+  delta =1
+  vec[whichWillDec] <- vec[whichWillDec] - delta
+  vec[whichWillInc] <- vec[whichWillInc] + delta
+  vec2 <- increment(vec2,whichWillDec, -delta)
+  vec2 <- increment(vec2,whichWillInc, delta)
+  expect_equal(vec, vec2)
 })

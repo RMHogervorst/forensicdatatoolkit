@@ -63,11 +63,13 @@ set_granularity <- function(dp) {
   ((0.1^dp) / 2) + rSprite.dust
 }
 
-
+create_init_vec <- function(n, mean, scale_min,scale_max){
+  as.integer(pmax(pmin(as.integer(runif(n) * 2 * mean), scale_max), scale_min))
+}
 
 seek_vector <- function(mean, sd, n, scale_min, scale_max, dp = 2, fixed = c()) {
   rN <- n - length(fixed)
-  vec <- pmax(pmin(as.integer(runif(rN) * 2 * mean), scale_max), scale_min)
+  vec <- create_init_vec(rN,mean, scale_max, scale_min)
   # replace any of the fixed numbers with a random non-fixed number
   if (length(fixed) > 0) {
     whichFixed <- which(vec %in% fixed)
@@ -212,10 +214,10 @@ determine_positions <- function(increaseSD, delta, vec, fixed, scale_min, scale_
     not_decrease_delta <- dont_pick_exact_opposite(vec, increasable, decreasing_pick, delta = delta)
     candidates <- not_decrease & not_decrease_delta & non_duplicates
     if (sum(candidates) == 0) {
-      candidates <- not_decrease & not_decrease_delta
+      candidates <- not_decrease_delta & non_duplicates
     }
     if (sum(candidates) == 0) {
-      candidates <- not_decrease
+      candidates <- non_duplicates
     }
     increasing_pick <- pick_one_position(candidates)
   } else if (!increaseSD) {
@@ -226,10 +228,10 @@ determine_positions <- function(increaseSD, delta, vec, fixed, scale_min, scale_
     smaller_then_pick <- (vec < vec[decreasing_pick])
     candidates <- not_decrease & not_decrease_delta & smaller_then_pick & non_duplicates
     if (sum(candidates) == 0) {
-      candidates <- not_decrease & not_decrease_delta
+      candidates <- not_decrease & not_decrease_delta  & non_duplicates
     }
     if (sum(candidates) == 0) {
-      candidates <- not_decrease
+      candidates <- not_decrease_delta  & non_duplicates
     }
     increasing_pick <- pick_one_position(candidates)
   }
@@ -243,7 +245,6 @@ determine_positions <- function(increaseSD, delta, vec, fixed, scale_min, scale_
 #  thus preserving the mean, but occasionally it will just do one of those things,
 #  if the resulting mean is still GRIM-consistent.
 sprite_delta <- function(vec, mean_value, sd, scale_min, scale_max, dp, fixed = c()) {
-  # vec <- sort(vec) # possible speed improvement on large vectors. ?
   delta <- if ((length(vec[vec > (scale_min + 1)])) > 0) {
     step_size()
   } else {
@@ -287,7 +288,7 @@ sprite_delta <- function(vec, mean_value, sd, scale_min, scale_max, dp, fixed = 
     newFullVec <- c(vec, fixed)
     newMean <- mean(newFullVec)
     if (round(newMean, dp) != mean_value) { # New mean is GRIM-consistent, so we will keep it.
-      vec <- increment(vec, picks$incr, delta)
+      vec <- increment(vec, picks$decr, -delta)
     }
   } else {
     stop("Error, something happened during execution phase of sprite delta")
@@ -317,6 +318,7 @@ increment <- function(vec, ind_vec, delta) {
 #' @export
 get_samples <- function(max_cases, n, mean, sd, scale_min, scale_max, dp = 2, fixed = c()) {
   # TODO: protect against scale_max < scale_min, missing values in max_cases, n, mean, etc.
+  if(scale_max < scale_min){stop("Scale max cannot be smaller than scale min")}
   # Check mean is possible with GRIM; if not, identify the nearest valid mean.
   mean_new <- make_mean_grim(mean, n, dp)
   # Determine minimum and maximum SDs.
