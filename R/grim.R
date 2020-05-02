@@ -17,28 +17,29 @@
 #' @param G   granularity
 #' @export
 #' @examples
-#' grim(mean = 20.54, n=24)
-grim_multi_item <- function(mean,n, items=1, digits = 2, G=1){
+#' grim(mean = 20.54, n = 24)
+grim_multi_item <- function(mean, n, items = 1, digits = 2, G = 1) {
   warn_sample_size_gt(
     n,
-    limit = grim_limit_n(decimals = digits, G=G),
-    test="GRIM")
+    limit = grim_limit_n(decimals = digits, G = G),
+    test = "GRIM"
+  )
 
-  mean_guess = round(n * mean * items)/items/n
+  mean_guess <- round(n * mean * items) / items / n
 
   mean_guess == mean
 }
 
 #' @describeIn grim_multi_item
-grim <- function(mean, n){ #.25 , 2
+grim <- function(mean, n) { # .25 , 2
   fraction <- extract_fraction(mean)
-  smallest_step <- 1/n
-  result = round(fraction / smallest_step,2)
+  smallest_step <- 1 / n
+  result <- round(fraction / smallest_step, 2)
   result == as.integer(result)
 }
 
-granularity_of_means <- function(n){
-  1/n
+granularity_of_means <- function(n) {
+  1 / n
 }
 
 
@@ -51,8 +52,8 @@ granularity_of_means <- function(n){
 #' and 2 decimals, what is the limit where
 #' grim is no longer able to find issues?
 #' 100, so up to and including 99 it works fine.
-grim_limit_n <- function(decimals, G =1){
-  G/10^-decimals
+grim_limit_n <- function(decimals, G = 1) {
+  G / 10^-decimals
 }
 
 
@@ -65,5 +66,3 @@ grim_limit_n <- function(decimals, G =1){
 #   # 6. Check if any match the reported SD
 #   # 7. If mean was provided perform GRIM test and check if mean matches the variance
 # }
-
-
