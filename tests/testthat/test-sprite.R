@@ -10,7 +10,7 @@ test_that("Seek vector works", {
 
 test_that("get sample creates correct samples", {
   # using example from original shiny app
-  samples_shiny <- get_samples(max_cases = 9, n = 45, mean = 3.533, sd = 1.561, scale_min = 1, scale_max = 7, dp = 3, fixed = c())
+  samples_shiny <- get_sprite_samples(max_cases = 9, n = 45, mean = 3.533, sd = 1.561, scale_min = 1, scale_max = 7, dp = 3, fixed = c())
   expect_true(all(round(apply(samples_shiny, 1, mean), 3) == 3.533))
   expect_true(all(round(apply(samples_shiny, 1, sd), 3) == 1.561))
   expect_equal(nrow(samples_shiny), 9)

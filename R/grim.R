@@ -30,7 +30,8 @@ grim_multi_item <- function(mean, n, items = 1, digits = 2, G = 1) {
   mean_guess == mean
 }
 
-#' @describeIn grim_multi_item
+#' @describeIn grim_multi_item Grim simple version
+#' @export
 grim <- function(mean, n) { # .25 , 2
   fraction <- extract_fraction(mean)
   smallest_step <- 1 / n

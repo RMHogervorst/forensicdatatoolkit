@@ -4,6 +4,9 @@
 #' with the results in further work.
 #' Sprite returns a matrix with a result per row.
 #' This is computational efficient but not easy to work with.
+#' TODO: sample_id in stead of result_id.
+#' TODO: export this as well or combine into handy tool for tidyverse style
+#' TODO investigate autoplot for matrix/ df? autoplot generic for class
 sprite_into_df <- function(sprite_matrix) {
   len_sprite <- nrow(sprite_matrix)
   n <- ncol(sprite_matrix)

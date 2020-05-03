@@ -316,7 +316,7 @@ increment <- function(vec, ind_vec, delta) {
 #' @param dp degrees of precision
 #' @param fixed a vector of values that you know are in the sprite sample
 #' @export
-get_samples <- function(max_cases, n, mean, sd, scale_min, scale_max, dp = 2, fixed = c()) {
+get_sprite_samples <- function(max_cases, n, mean, sd, scale_min, scale_max, dp = 2, fixed = c()) {
   # TODO: protect against scale_max < scale_min, missing values in max_cases, n, mean, etc.
   if(scale_max < scale_min){stop("Scale max cannot be smaller than scale min")}
   # Check mean is possible with GRIM; if not, identify the nearest valid mean.
