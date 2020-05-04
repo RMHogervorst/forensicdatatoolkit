@@ -1,6 +1,6 @@
 #DEBIT
 
-#' Check sd of binary variables
+#' Check Standard Deviation of binary variables
 #'
 #' Binary variables can only take on 1 or 0 and that makes the
 #' mean and standard deviation linked to each other.
@@ -9,6 +9,7 @@
 #' @param sd reported sd value you want to check
 #' @param n reported sample size
 #' @param dp degrees of precision, rounding digits applied. dp=3 rounds 0.0035 to 0.004.
+#' @family granularity
 #' @export
 check_sd_binary <- function(mean, sd,n, dp=3){
   m<- mean

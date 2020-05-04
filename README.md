@@ -31,14 +31,14 @@ library(forensicdatatoolkit)
 
 ## Techniques available
 
-What is in the package (citations in separate file) \[LINK to full
-citations vignette\]
+What is in the package.
 
   - [x] Granularity-Related Inconsistency of Means (GRIM)
   - \[\] Granularity-Related Inconsistency of Means Mapped to Error
     Repeats (GRIMMER)
   - [x] Sample Parameter Reconstruction via Iterative Techniques
     (SPRITE)
+  - [x] (DEBIT): A simple consistency test for binary data
 
 We can use these tools to investigate summary statistics. For example if
 we collect statistics from a set of papers we can investigate them.
@@ -90,7 +90,7 @@ means that every mean must be divisable by that stepsize. 3.5 is
 therefore fine but 3.53 is not.
 
 ``` r
-example_data$mean_possible <- grim(example_data$means, example_data$n)
+example_data$mean_possible <- check_mean(example_data$means, example_data$n)
 example_data[, c("study", "description", "mean_possible")]
 #>   study     description mean_possible
 #> 1     1 food acceptance          TRUE
@@ -110,14 +110,12 @@ code** </summary>
 library(dplyr)
 example_data %>%
   mutate(
-    mean_possible = grim(mean = means, n = n)
+    mean_possible = check_mean(mean = means, n = n)
   ) %>%
   select(study, description, mean_possible)
 ```
 
 </details>
-
-CORVIDS ?
 
 Please note that the ‘forensicdatatoolkit’ project is released with a
 [Contributor Code of Conduct](.github/CODE_OF_CONDUCT.md). By

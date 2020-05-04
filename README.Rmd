@@ -42,11 +42,12 @@ library(forensicdatatoolkit)
 
 ## Techniques available
 
-What is in the package (citations in separate file) [LINK to full citations vignette]
+What is in the package.
 
 - [x] Granularity-Related Inconsistency of Means (GRIM)
 - [] Granularity-Related Inconsistency of Means Mapped to Error Repeats (GRIMMER)
-- [X] Sample Parameter Reconstruction via Iterative Techniques (SPRITE)
+- [x] Sample Parameter Reconstruction via Iterative Techniques (SPRITE)
+- [x] (DEBIT): A simple consistency test for binary data
 
 
 We can use these tools to investigate summary statistics. 
@@ -84,7 +85,7 @@ the mean score would go up by 1/20th. The minimal stepsize is 1/20th or 0.05. Th
 
 
 ```{r base r style}
-example_data$mean_possible <- grim(example_data$means, example_data$n)
+example_data$mean_possible <- check_mean(example_data$means, example_data$n)
 example_data[, c("study", "description", "mean_possible")]
 ```
 
@@ -94,7 +95,7 @@ example_data[, c("study", "description", "mean_possible")]
 library(dplyr)
 example_data %>%
   mutate(
-    mean_possible = grim(mean = means, n = n)
+    mean_possible = check_mean(mean = means, n = n)
   ) %>%
   select(study, description, mean_possible)
 ```
@@ -102,8 +103,6 @@ example_data %>%
 </details>
 
 
-
-CORVIDS ?
 
 Please note that the 'forensicdatatoolkit' project is released with a
 [Contributor Code of Conduct](.github/CODE_OF_CONDUCT.md).

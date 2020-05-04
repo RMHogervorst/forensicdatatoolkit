@@ -14,10 +14,11 @@
 #' @param items how many observations
 #' @param digits digits precision
 #' @param G   granularity
+#' @family granularity
 #' @export
 #' @examples
-#' grim(mean = 20.54, n = 24)
-grim_multi_item <- function(mean, n, items = 1, digits = 2, G = 1) {
+#' check_mean(mean = 20.54, n = 24)
+check_mean_multi_item <- function(mean, n, items = 1, digits = 2, G = 1) {
   warn_sample_size_gt(
     n,
     limit = grim_limit_n(decimals = digits, G = G),
@@ -29,9 +30,9 @@ grim_multi_item <- function(mean, n, items = 1, digits = 2, G = 1) {
   mean_guess == mean
 }
 
-#' @describeIn grim_multi_item Grim simple version
+#' @describeIn check_mean_multi_item check_mean simple version
 #' @export
-grim <- function(mean, n) {
+check_mean <- function(mean, n) {
   fraction <- extract_fraction(mean)
   smallest_step <- 1 / n
   result <- round(fraction / smallest_step, 2)

@@ -33,17 +33,17 @@ rSprite.dust <- 1e-12
 #' @param fixed a vector of values that you know are in the sprite sample
 #' @details ## Advanced use
 #' It is also possible to use the underlying functions directly.
-#' - [seek_sprite_vector()][forensicdatatoolkit::seek_sprite_vector()] if you need a single vector only
-#' - [get_sprite_samples_matrix()][forensicdatatoolkit::get_sprite_samples_matrix] if you want to work with a matrix of vectors
+#' - [simulate_vector()][forensicdatatoolkit::simulate_vector()] if you need a single vector only
+#' - [simulate_samples_matrix()][forensicdatatoolkit::simulate_samples_matrix] if you want to work with a matrix of vectors
 #' -  if you would like to turn the matrix into a dataframe use the [sprite_into_df()][forensicdatatoolkit::sprite_into_df()] function
 #'
 #' @export
 #' @family sprite
 #' @examples
-#' sprite_samples(10, 10, 2.5, 2, 1, 5)
-#' sprite_samples(2, 20, 2.5, 2, 1, 5, fixed = c(1, 1))
-sprite_samples <- function(max_cases, n, mean, sd, scale_min, scale_max, dp = 2, fixed = c()) {
-  matrix_ <- get_sprite_samples_matrix(max_cases = max_cases, n = n, mean = mean, sd = sd, scale_min = scale_min, scale_max = scale_max, dp = dp, fixed = fixed)
+#' simulate_samples(10, 10, 2.5, 2, 1, 5)
+#' simulate_samples(2, 20, 2.5, 2, 1, 5, fixed = c(1, 1))
+simulate_samples <- function(max_cases, n, mean, sd, scale_min, scale_max, dp = 2, fixed = c()) {
+  matrix_ <- simulate_samples_matrix(max_cases = max_cases, n = n, mean = mean, sd = sd, scale_min = scale_min, scale_max = scale_max, dp = dp, fixed = fixed)
   sprite_into_df(matrix_)
 }
 
@@ -63,7 +63,7 @@ sprite_samples <- function(max_cases, n, mean, sd, scale_min, scale_max, dp = 2,
 #' @param fixed a vector of values that you know are in the sprite sample
 #' @family sprite
 #' @export
-seek_sprite_vector <- function(mean, sd, n, scale_min, scale_max, dp = 2, fixed = c()) {
+simulate_vector <- function(mean, sd, n, scale_min, scale_max, dp = 2, fixed = c()) {
   rN <- n - length(fixed)
   vec <- create_init_vec(rN, mean, scale_max, scale_min)
   # replace any of the fixed numbers with a random non-fixed number
@@ -91,7 +91,7 @@ seek_sprite_vector <- function(mean, sd, n, scale_min, scale_max, dp = 2, fixed 
 #' @param fixed a vector of values that you know are in the sprite sample
 #' @family sprite
 #' @export
-get_sprite_samples_matrix <- function(max_cases, n, mean, sd, scale_min, scale_max, dp = 2, fixed = c()) {
+simulate_samples_matrix <- function(max_cases, n, mean, sd, scale_min, scale_max, dp = 2, fixed = c()) {
   # TODO: protect against missing values in max_cases, n, mean, etc.
   if (scale_max < scale_min) {
     stop("Scale max cannot be smaller than scale min")
@@ -105,7 +105,7 @@ get_sprite_samples_matrix <- function(max_cases, n, mean, sd, scale_min, scale_m
   looptotal <- max_cases * 8 # 8 is arbitrary; break early if we find enough unique cases.
   results <- matrix(0L, nrow = looptotal, ncol = n)
   for (i in 1:looptotal) {
-    vec <- seek_sprite_vector(mean_new, sd, n, scale_min, scale_max, dp, fixed)
+    vec <- simulate_vector(mean_new, sd, n, scale_min, scale_max, dp, fixed)
     # If no solution was found on this run, skip
     if (length(vec) == 0) {
       next

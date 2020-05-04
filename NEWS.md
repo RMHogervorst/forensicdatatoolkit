@@ -8,3 +8,4 @@
 * Created README and Techniques Vignette stub
 * Implemented sprite working version including extensive testing
 * Implemented binary check
+* Renamed functions to check_*, which makes more sense than the name of the technique
