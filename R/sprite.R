@@ -20,56 +20,52 @@
 rSprite.huge <- 1e15
 rSprite.dust <- 1e-12
 
-#' Copy from script, slight modifications to keep argument names consistent.
-make_mean_grim <- function(mean, n, dp = 2) {
-  gMean <- mean
-  int <- round(mean * n) # nearest integer; doesn't matter if this rounds up or down
-  frac <- int / n
-  dif <- abs(mean - frac)
-  # allow for rounding errors
-  gran <- set_granularity(dp)
-  if (dif > gran) {
-    gMean <- round(frac, dp)
-    warning(paste0("Fails GRIM test for mean ", mean, ", N=", n, " nearest mean is: ", gMean))
-  }
-  return(gMean)
-}
-
-determine_sd_limits <- function(mean, n, scale_min, scale_max, dp = 2) {
-  if (scale_min >= scale_max) {
-    stop("scale_min cannot be larger than scale_max")
-  }
-  maxtotal <- round(mean * n)
-  aMax <- scale_min # "aMax" means "value of a to produce the max SD"
-  aMin <- floor(mean)
-  bMax <- max(scale_max, scale_min + 1, aMin + 1)
-  bMin <- aMin + 1
-  result <- c(
-    calc_sd(aMin, bMin, maxtotal, n, dp),
-    calc_sd(aMax, bMax, maxtotal, n, dp)
-  )
-  result
+#' Get sprite samples data.frame
+#'
+#' Create samples that match the mean and sd.
+#' @param max_cases maximum cases
+#' @param n total cases
+#' @param mean mean value
+#' @param sd standard deviation
+#' @param scale_min minimum of scale
+#' @param scale_max maximum of scale
+#' @param dp degrees of precision, places behind the comma
+#' @param fixed a vector of values that you know are in the sprite sample
+#' @details ## Advanced use
+#' It is also possible to use the underlying functions directly.
+#' - [seek_sprite_vector()][forensicdatatoolkit::seek_sprite_vector()] if you need a single vector only
+#' - [get_sprite_samples_matrix()][forensicdatatoolkit::get_sprite_samples_matrix] if you want to work with a matrix of vectors
+#' -  if you would like to turn the matrix into a dataframe use the [sprite_into_df()][forensicdatatoolkit::sprite_into_df()] function
+#'
+#' @export
+#' @family sprite
+#' @examples
+#' sprite_samples(10, 10, 2.5, 2, 1, 5)
+#' sprite_samples(2, 20, 2.5, 2, 1, 5, fixed = c(1, 1))
+sprite_samples <- function(max_cases, n, mean, sd, scale_min, scale_max, dp = 2, fixed = c()) {
+  matrix_ <- get_sprite_samples_matrix(max_cases = max_cases, n = n, mean = mean, sd = sd, scale_min = scale_min, scale_max = scale_max, dp = dp, fixed = fixed)
+  sprite_into_df(matrix_)
 }
 
 
-calc_sd <- function(a, b, total, n, dp) {
-  k <- round((total - (n * b)) / (a - b))
-  k <- min(max(k, 1), n - 1) # don't get it yet
-  vec <- c(rep(a, k), rep(b, n - k))
-  round(sd(vec), dp)
-}
 
-set_granularity <- function(dp) {
-  ((0.1^dp) / 2) + rSprite.dust
-}
-
-create_init_vec <- function(n, mean, scale_min,scale_max){
-  as.integer(pmax(pmin(as.integer(runif(n) * 2 * mean), scale_max), scale_min))
-}
-
-seek_vector <- function(mean, sd, n, scale_min, scale_max, dp = 2, fixed = c()) {
+#' Find single vector of mean and sd.
+#'
+#' Return a vector of length n with an average close to mean and
+#' standard deviation close to sd. In most cases you want more than one
+#' sample, to see what are feasable solutions see [sprite_samples()][forensicdatatoolkit::sprite_samples()]
+#' @param n total cases
+#' @param mean mean value
+#' @param sd standard deviation
+#' @param scale_min minimum of scale
+#' @param scale_max maximum of scale
+#' @param dp degrees of precision, places behind the comma
+#' @param fixed a vector of values that you know are in the sprite sample
+#' @family sprite
+#' @export
+seek_sprite_vector <- function(mean, sd, n, scale_min, scale_max, dp = 2, fixed = c()) {
   rN <- n - length(fixed)
-  vec <- create_init_vec(rN,mean, scale_max, scale_min)
+  vec <- create_init_vec(rN, mean, scale_max, scale_min)
   # replace any of the fixed numbers with a random non-fixed number
   if (length(fixed) > 0) {
     whichFixed <- which(vec %in% fixed)
@@ -81,6 +77,57 @@ seek_vector <- function(mean, sd, n, scale_min, scale_max, dp = 2, fixed = c()) 
   vec <- loop_until_sd_is_ok(vec, mean, sd, scale_min, scale_max, dp, fixed)
   vec
 }
+
+#' Get sprite samples
+#'
+#' Create samples that match the mean and sd.
+#' @param max_cases maximum cases
+#' @param n total cases
+#' @param mean mean value
+#' @param sd standard deviation
+#' @param scale_min minimum of scale
+#' @param scale_max maximum of scale
+#' @param dp degrees of precision
+#' @param fixed a vector of values that you know are in the sprite sample
+#' @family sprite
+#' @export
+get_sprite_samples_matrix <- function(max_cases, n, mean, sd, scale_min, scale_max, dp = 2, fixed = c()) {
+  # TODO: protect against missing values in max_cases, n, mean, etc.
+  if (scale_max < scale_min) {
+    stop("Scale max cannot be smaller than scale min")
+  }
+  # Check mean is possible with GRIM; if not, identify the nearest valid mean.
+  mean_new <- make_mean_grim(mean, n, dp)
+  # Determine minimum and maximum SDs.
+  sd_limits <- determine_sd_limits(mean_new, n, scale_min, scale_max, dp)
+  if (max_cases < 1) stop("max_cases needs to be a positive integer")
+  ## -- here pre allocate
+  looptotal <- max_cases * 8 # 8 is arbitrary; break early if we find enough unique cases.
+  results <- matrix(0L, nrow = looptotal, ncol = n)
+  for (i in 1:looptotal) {
+    vec <- seek_sprite_vector(mean_new, sd, n, scale_min, scale_max, dp, fixed)
+    # If no solution was found on this run, skip
+    if (length(vec) == 0) {
+      next
+    }
+    full_vec <- sort(c(vec, fixed))
+    results[i, ] <- as.integer(full_vec)
+    # break early if n results is reached
+    if (n_unique_rows(results) == max_cases) {
+      break
+    }
+  }
+  ## return error if no results
+  if (sum(non_zero_rows(results)) == 0) stop("No results were found")
+  # return matrix with only unique results. Don't simplify so we always return a matrix.
+  unique_rows_found <- n_unique_rows(results)
+  if (unique_rows_found < max_cases) {
+    s <- paste0(max_cases, " requested but only ", unique_rows_found, " found.")
+    warning(s)
+  }
+  results[unique_rows(results), , drop = FALSE]
+}
+
 
 loop_until_mean_is_ok <- function(vec, mean, scale_min, scale_max, dp, fixed = c()) {
   n <- length(c(vec, fixed))
@@ -109,7 +156,7 @@ loop_until_mean_is_ok <- function(vec, mean, scale_min, scale_max, dp, fixed = c
     }
 
     canBumpMean <- which(filter)
-    bumpMean <- canBumpMean[as.integer(runif(1) * length(canBumpMean)) + 1] # select a changeable number
+    bumpMean <- canBumpMean[as.integer(stats::runif(1) * length(canBumpMean)) + 1] # select a changeable number
     vec[bumpMean] <- vec[bumpMean] + (if (increaseMean) deltaMean else -deltaMean)
   }
   if (!meanOK) {
@@ -144,41 +191,7 @@ loop_until_sd_is_ok <- function(vec, required_mean, required_sd, scale_min, scal
   result
 }
 
-#' Function that outputs 1 most of the times but <20% of the time 2
-step_size <- function() {
-  if ((runif(1) < 0.2)) {
-    2
-  } else {
-    1
-  }
-}
 
-
-dont_pick_exact_opposite <- function(vec, increasable, decreasing_pick, delta) {
-  diff <- decreasing_pick - delta
-  result <- increasable & (vec != diff)
-  if (sum(result) == 0) {
-    result <- increasable
-  }
-  result
-}
-
-
-
-#' select a random TRUE position out of logical vector
-pick_one_position <- function(logical_vector) {
-  if (sum(logical_vector) == 0) stop("There are no TRUE values in vector")
-  if (class(logical_vector) != "logical") stop("Not a logical vector")
-  pos <- which(logical_vector)
-  pos[as.integer(runif(1) * length(pos)) + 1]
-}
-
-
-not_pick <- function(pick, n) {
-  truths <- rep(TRUE, n)
-  truths[pick] <- FALSE
-  truths
-}
 #' Logic to determine the positions
 #'
 #' @return a list of 2 numbers, the indexes (positions)
@@ -228,10 +241,10 @@ determine_positions <- function(increaseSD, delta, vec, fixed, scale_min, scale_
     smaller_then_pick <- (vec < vec[decreasing_pick])
     candidates <- not_decrease & not_decrease_delta & smaller_then_pick & non_duplicates
     if (sum(candidates) == 0) {
-      candidates <- not_decrease & not_decrease_delta  & non_duplicates
+      candidates <- not_decrease & not_decrease_delta & non_duplicates
     }
     if (sum(candidates) == 0) {
-      candidates <- not_decrease_delta  & non_duplicates
+      candidates <- not_decrease_delta & non_duplicates
     }
     increasing_pick <- pick_one_position(candidates)
   }
@@ -268,8 +281,8 @@ sprite_delta <- function(vec, mean_value, sd, scale_min, scale_max, dp, fixed = 
 
   # execute actions
   # random: check if mean is ok, if so break out
-  mean_check <- runif(1) < 0.1
-  decFirst <- runif(1) < 0.5
+  mean_check <- stats::runif(1) < 0.1
+  decFirst <- stats::runif(1) < 0.5
   if (!mean_check) {
     # ordering of actions doesn't matter
     vec <- increment(vec, picks$incr, delta)
@@ -294,83 +307,4 @@ sprite_delta <- function(vec, mean_value, sd, scale_min, scale_max, dp, fixed = 
     stop("Error, something happened during execution phase of sprite delta")
   }
   vec
-}
-
-
-increment <- function(vec, ind_vec, delta) {
-  vec[ind_vec] <- vec[ind_vec] + delta
-  vec
-}
-
-
-
-#' Get sprite samples
-#'
-#' Create samples that match the mean and sd.
-#' @param max_cases maximum cases
-#' @param n total cases
-#' @param mean mean value
-#' @param sd standard deviation
-#' @param scale_min minimum of scale
-#' @param scale_max maximum of scale
-#' @param dp degrees of precision
-#' @param fixed a vector of values that you know are in the sprite sample
-#' @export
-get_sprite_samples <- function(max_cases, n, mean, sd, scale_min, scale_max, dp = 2, fixed = c()) {
-  # TODO: protect against scale_max < scale_min, missing values in max_cases, n, mean, etc.
-  if(scale_max < scale_min){stop("Scale max cannot be smaller than scale min")}
-  # Check mean is possible with GRIM; if not, identify the nearest valid mean.
-  mean_new <- make_mean_grim(mean, n, dp)
-  # Determine minimum and maximum SDs.
-  sd_limits <- determine_sd_limits(mean_new, n, scale_min, scale_max, dp)
-  if (max_cases < 1) stop("max_cases needs to be a positive integer")
-  ## -- here pre allocate
-  looptotal <- max_cases * 8 # 8 is arbitrary; break early if we find enough unique cases.
-  results <- matrix(0L, nrow = looptotal, ncol = n)
-  for (i in 1:looptotal) {
-    vec <- seek_vector(mean_new, sd, n, scale_min, scale_max, dp, fixed)
-    # If no solution was found on this run, skip
-    if (length(vec) == 0) {
-      next
-    }
-    full_vec <- sort(c(vec, fixed))
-    results[i, ] <- as.integer(full_vec)
-    # break early if n results is reached
-    if (n_unique_rows(results) == max_cases) {
-      break
-    }
-  }
-  ## return error if no results
-  if (sum(non_zero_rows(results)) == 0) stop("No results were found")
-  # return matrix with only unique results. Don't simplify so we always return a matrix.
-  unique_rows_found <- n_unique_rows(results)
-  if (unique_rows_found < max_cases) {
-    s <- paste0(max_cases, " requested but only ", unique_rows_found, " found.")
-    warning(s)
-  }
-  results[unique_rows(results), , drop = FALSE]
-}
-
-# convenience functions to clearly show intent
-#' Count unique results
-#' @return number.
-n_unique_rows <- function(matrix) {
-  sum(unique_rows(matrix))
-}
-#' All unique columns
-#' combine non zero and not duplicate cols
-#' @return a logical vector indicating unique columns in a matrix
-unique_rows <- function(matrix) {
-  non_zero_rows(matrix) & not_duplicate_rows(matrix)
-}
-#' Find non duplicate rows in a matrix
-#' @return logical vector of rows that are not duplicates
-not_duplicate_rows <- function(matrix) {
-  !duplicated.matrix(matrix, MARGIN = 1)
-}
-#' Find rows that are not zero
-#' Which we began with.
-#' @return logical vector of rows that are not zero
-non_zero_rows <- function(matrix) {
-  rowSums(matrix) != 0L
 }

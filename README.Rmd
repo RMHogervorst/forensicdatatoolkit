@@ -101,46 +101,13 @@ example_data %>%
 
 </details>
 
-## SPRITE (Sample Parameter Reconstruction via Iterative TEchniques)
-[Link to preprint here]
-
-It is also possible to work out reasonable data based on means, standard deviations and minimum and maximum of scale. 
-
-> In other words, for any given mean, we shuffle the available values (very quickly) until we generate a sample with the parameters we’re interested in. Then we do it again, and again, and again. We find hundreds or thousands of plausible solutions. We can model them further if we want.
-
-if want to check what the data could look like.
-
-Example from [James Heathers](https://medium.com/hackernoon/introducing-sprite-and-the-case-of-the-carthorse-child-58683c2bfeb) 
-
-The data comes from “Attractive Names Sustain Increased Vegetable Intake in Schools” by Wansink et.al. (2012).
-Mean=19.4, SD=19.9, n=45
-Let’s add a fact: you can’t have less than zero carrots (there are no negative carrots, this isn’t Star Trek).
-
-```{r}
-library(ggplot2) # because we like pretty graphs
-samples <- get_sprite_samples(max_cases = 10, n=45,mean = 19.4,sd=19.9,scale_min = 1, scale_max = 1000)
-result <- forensicdatatoolkit:::sprite_into_df(samples) # turn matrix into sample_nr
-ggplot(result, aes(answer, group=result_id))+
-  geom_histogram()+
-  facet_wrap(~result_id)+
-  labs(
-    title = "Baby carrots eaten",
-    subtitle = "by a child, according to this study",
-    x = "number of carrots eaten",
-    y = "frequency"
-  )
-```
-```{r}
-library(dplyr)
-result %>% group_by(result_id) %>% 
-  summarize(max_carrots=max(answer)) %>% 
-  ggplot(aes(max_carrots))+
-  geom_histogram()
-```
 
 
 CORVIDS ?
 
+Please note that the 'forensicdatatoolkit' project is released with a
+[Contributor Code of Conduct](.github/CODE_OF_CONDUCT.md).
+By contributing to this project, you agree to abide by its terms.
 
 <details>
 <summary> At the moment of creation (when I knitted this document ) this was the state of my machine: **click here to expand** </summary>

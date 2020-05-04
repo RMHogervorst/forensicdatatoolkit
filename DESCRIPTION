@@ -2,11 +2,13 @@ Package: forensicdatatoolkit
 Title: Forensic Data Toolkit
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "Roel M.",
-           family = "Hogervorst",
-           role = c("aut", "cre"),
-           email = "hogervorst.rm@gmail.com",
-           comment = c(ORCID = "0000-0001-7509-0328"))
+    c(person(given = "Roel M.",family = "Hogervorst",role = c("aut", "cre"),
+             email = "hogervorst.rm@gmail.com",comment = c(ORCID = "0000-0001-7509-0328")),
+      person(given = "Nicholas J. L.",family= "Brown", role="aut", comment=c(ORCID="0000-0003-1579-0730")),
+      person(given = "James A.J. ",family= "Heathers", role="aut", comment=c(ORCID="0000-0002-0936-026X")),
+      person(given = "Tim",family= "van der Zee", role="aut", comment=c(ORCID="000-0002-8058-9163")),
+      person(given = "Jordan",family= "Anaya", role="aut", comment=c(ORCID="0000-0002-6166-4113"))
+           )
 Description: This is a combination of tools for investigating data from the published literature.
       These tools do not need the underlying data, but use the reported summary statistics
       to detect anomalies.
@@ -14,5 +16,11 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Suggests: 
-    testthat (>= 2.1.0)
+    testthat (>= 2.1.0),
+    knitr,
+    rmarkdown
 RoxygenNote: 7.1.0
+Roxygen: list(markdown = TRUE)
+Imports: 
+    ggplot2
+VignetteBuilder: knitr

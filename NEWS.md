@@ -6,3 +6,5 @@
 * Copied and modified Sprite parts from osf version rSPRITE
 * Extracted functionality from large functions in original
 * Created README and Techniques Vignette stub
+* Implemented sprite working version including extensive testing
+* Implemented binary check

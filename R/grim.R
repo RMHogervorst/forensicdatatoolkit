@@ -1,8 +1,7 @@
 #' Granularity-Related Inconsistency of Means (GRIM)
 #'
 #' This technique uses a very simple test to see if means are mathematically
-#' possible  with
-#' a given sample size.
+#' possible  with a given sample size.
 #'
 #' @details
 #' Technique first described by Nicholas J. L. Brown & James A. J. Heathers.
@@ -32,7 +31,7 @@ grim_multi_item <- function(mean, n, items = 1, digits = 2, G = 1) {
 
 #' @describeIn grim_multi_item Grim simple version
 #' @export
-grim <- function(mean, n) { # .25 , 2
+grim <- function(mean, n) {
   fraction <- extract_fraction(mean)
   smallest_step <- 1 / n
   result <- round(fraction / smallest_step, 2)

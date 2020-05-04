@@ -28,8 +28,7 @@ grim(mean, n)
 }
 \description{
 This technique uses a very simple test to see if means are mathematically
-possible  with
-a given sample size.
+possible  with a given sample size.
 }
 \details{
 Technique first described by Nicholas J. L. Brown & James A. J. Heathers.

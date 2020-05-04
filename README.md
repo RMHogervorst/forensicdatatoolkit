@@ -117,67 +117,11 @@ example_data %>%
 
 </details>
 
-## SPRITE (Sample Parameter Reconstruction via Iterative TEchniques)
-
-\[Link to preprint here\]
-
-It is also possible to work out reasonable data based on means, standard
-deviations and minimum and maximum of scale.
-
-> In other words, for any given mean, we shuffle the available values
-> (very quickly) until we generate a sample with the parameters we’re
-> interested in. Then we do it again, and again, and again. We find
-> hundreds or thousands of plausible solutions. We can model them
-> further if we want.
-
-if want to check what the data could look like.
-
-Example from [James
-Heathers](https://medium.com/hackernoon/introducing-sprite-and-the-case-of-the-carthorse-child-58683c2bfeb)
-
-The data comes from “Attractive Names Sustain Increased Vegetable Intake
-in Schools” by Wansink et.al. (2012). Mean=19.4, SD=19.9, n=45 Let’s add
-a fact: you can’t have less than zero carrots (there are no negative
-carrots, this isn’t Star Trek).
-
-``` r
-library(ggplot2) # because we like pretty graphs
-samples <- get_sprite_samples(max_cases = 10, n=45,mean = 19.4,sd=19.9,scale_min = 1, scale_max = 1000)
-result <- forensicdatatoolkit:::sprite_into_df(samples) # turn matrix into sample_nr
-ggplot(result, aes(answer, group=result_id))+
-  geom_histogram()+
-  facet_wrap(~result_id)+
-  labs(
-    title = "Baby carrots eaten",
-    subtitle = "by a child, according to this study",
-    x = "number of carrots eaten",
-    y = "frequency"
-  )
-#> `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-```
-
-<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
-
-``` r
-library(dplyr)
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
-result %>% group_by(result_id) %>% 
-  summarize(max_carrots=max(answer)) %>% 
-  ggplot(aes(max_carrots))+
-  geom_histogram()
-#> `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-```
-
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
-
 CORVIDS ?
+
+Please note that the ‘forensicdatatoolkit’ project is released with a
+[Contributor Code of Conduct](.github/CODE_OF_CONDUCT.md). By
+contributing to this project, you agree to abide by its terms.
 
 <details>
 
@@ -196,7 +140,7 @@ sessioninfo::session_info()
 #>  collate  en_US.UTF-8                 
 #>  ctype    en_US.UTF-8                 
 #>  tz       Europe/Amsterdam            
-#>  date     2020-05-03                  
+#>  date     2020-05-04                  
 #> 
 #> ─ Packages ───────────────────────────────────────────────────────────────────
 #>  package             * version    date       lib source        
@@ -205,18 +149,16 @@ sessioninfo::session_info()
 #>  colorspace            1.4-1      2019-03-18 [1] CRAN (R 3.6.0)
 #>  crayon                1.3.4      2017-09-16 [1] CRAN (R 3.6.0)
 #>  digest                0.6.25     2020-02-23 [1] CRAN (R 3.6.0)
-#>  dplyr               * 0.8.5      2020-03-07 [1] CRAN (R 3.6.0)
+#>  dplyr                 0.8.5      2020-03-07 [1] CRAN (R 3.6.0)
 #>  ellipsis              0.3.0      2019-09-20 [1] CRAN (R 3.6.0)
 #>  evaluate              0.14       2019-05-28 [1] CRAN (R 3.6.0)
 #>  fansi                 0.4.1      2020-01-08 [1] CRAN (R 3.6.0)
-#>  farver                2.0.3      2020-01-16 [1] CRAN (R 3.6.0)
-#>  forensicdatatoolkit * 0.0.0.9000 2020-05-03 [1] local         
-#>  ggplot2             * 3.3.0      2020-03-05 [1] CRAN (R 3.6.0)
+#>  forensicdatatoolkit * 0.0.0.9000 2020-05-04 [1] local         
+#>  ggplot2               3.3.0      2020-03-05 [1] CRAN (R 3.6.0)
 #>  glue                  1.4.0      2020-04-03 [1] CRAN (R 3.6.2)
 #>  gtable                0.3.0      2019-03-25 [1] CRAN (R 3.6.0)
 #>  htmltools             0.4.0      2019-10-04 [1] CRAN (R 3.6.0)
 #>  knitr                 1.28       2020-02-06 [1] CRAN (R 3.6.0)
-#>  labeling              0.3        2014-08-23 [1] CRAN (R 3.6.0)
 #>  lifecycle             0.2.0      2020-03-06 [1] CRAN (R 3.6.0)
 #>  magrittr              1.5        2014-11-22 [1] CRAN (R 3.6.0)
 #>  munsell               0.5.0      2018-06-12 [1] CRAN (R 3.6.0)

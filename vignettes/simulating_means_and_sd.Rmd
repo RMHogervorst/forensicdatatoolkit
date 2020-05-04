@@ -1,0 +1,92 @@
+---
+title: "Simulating means and sds"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Simulating means and sds}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(forensicdatatoolkit)
+library(ggplot2)
+```
+
+We simulate reasonable datasets for a given mean and standard deviation using the SPRITE
+(Sample Parameter Reconstruction via Iterative TEchniques) algorithm. 
+
+How does it work:
+The algorithm starts with a random initialization integers of length n close to the intended mean: 
+
+- for example  [0, 1, 3, 5, 6, 2 , 1 ,3, 4]
+- it tweaks values (adding or subtracting values) until it reaches the required mean
+- it tweaks values (increasing one and decreasing another value) until the required standard deviation is found
+
+Most cases of sample reconstruction in medicine and social science are constrained because we know certain things:
+- the value of any answer can only be an integer
+- the mean
+- the standard deviation
+- the n
+- the minimum of the scale
+- the maximum of the scale
+
+Given these limits, with a reasonable small n, results are quickly found. 
+Note that the results from this technique are not exhaustive, nor does the algorithm enumerate every possible solution in the search space. It only returns plausible solutions.
+
+## SPRITE (Sample Parameter Reconstruction via Iterative TEchniques)
+[Recovering data from summary statistics: Sample Parameter Reconstruction via Iterative TEchniques (SPRITE)](https:://peerj.preprints.26968v1)
+
+It is also possible to work out reasonable data based on means, standard deviations and minimum and maximum of scale. 
+
+> In other words, for any given mean, we shuffle the available values (very quickly) until we generate a sample with the parameters we’re interested in. Then we do it again, and again, and again. We find hundreds or thousands of plausible solutions. We can model them further if we want.
+
+if want to check what the data could look like.
+
+Example from [James Heathers](https://medium.com/hackernoon/introducing-sprite-and-the-case-of-the-carthorse-child-58683c2bfeb) 
+
+The data comes from “Attractive Names Sustain Increased Vegetable Intake in Schools” by Wansink et.al. (2012).
+Mean=19.4, SD=19.9, n=45
+Let’s add a fact: you can’t have less than zero carrots (there are no negative carrots, this isn’t Star Trek).
+
+
+
+```{r, cache=TRUE}
+# this is actually a difficult problem for sprite
+result <- sprite_samples(max_cases = 5, n=45,mean = 19.4,sd=19.9,scale_min = 1, scale_max = 100)
+```
+
+
+```{r}
+ggplot(result, aes(answer, group=sample_id))+
+  geom_bar()+
+  facet_wrap(~sample_id)+
+  labs(
+    title = "Baby carrots eaten",
+    subtitle = "by a child, according to this study",
+    x = "number of carrots eaten",
+    y = "frequency"
+  )
+```
+
+Or use the autoplot function if you are in a hurry
+
+```{r}
+autoplot(result)
+```
+
+
+
+
+## Original source 
+This R version of the algorithm is modified from the original source code developed by Nicholas Brown et al. at [OSF](https://osf.io/scpbz/). 
+
+## References
+
+Heathers JA, Anaya J, van der Zee T, Brown NJ. 2018. Recovering data from summary statistics: Sample Parameter Reconstruction via Iterative TEchniques (SPRITE) PeerJ Preprints 6:e26968v1 https://doi.org/10.7287/peerj.preprints.26968v1
