@@ -63,7 +63,7 @@ simulate_samples <- function(max_cases, n, mean, sd, scale_min, scale_max, dp = 
 #' @param fixed a vector of values that you know are in the sprite sample
 #' @family sprite
 #' @export
-simulate_vector <- function(mean, sd, n, scale_min, scale_max, dp = 2, fixed = c()) {
+simulate_vector <- function(mean, sd, n, scale_min, scale_max, dp = 2, fixed = c(), max_rounds=1000L) {
   rN <- n - length(fixed)
   vec <- create_init_vec(rN, mean, scale_max, scale_min)
   # replace any of the fixed numbers with a random non-fixed number
@@ -74,7 +74,7 @@ simulate_vector <- function(mean, sd, n, scale_min, scale_max, dp = 2, fixed = c
   }
 
   vec <- loop_until_mean_is_ok(vec, mean, scale_min, scale_max, dp, fixed)
-  vec <- loop_until_sd_is_ok(vec, mean, sd, scale_min, scale_max, dp, fixed)
+  vec <- loop_until_sd_is_ok(vec, mean, sd, scale_min, scale_max, dp, fixed, max_rounds = max_rounds)
   vec
 }
 

@@ -125,6 +125,13 @@ calc_sd <- function(a, b, total, n, dp) {
   k <- round((total - (n * b)) / (a - b))
   k <- min(max(k, 1), n - 1) # don't get it yet
   vec <- c(rep(a, k), rep(b, n - k))
+  diff <- sum(vec)-total
+  if ((diff < 0) && (k > 1)) {
+    vec <- c(rep(a, k - 1), abs(diff), rep(b, n - k))
+  }
+  else if ((diff > 0) && ((n - k) > 1)) {
+    vec <- c(rep(a, k), diff, rep(b, n - k - 1))
+  }
   round(sd(vec), dp)
 }
 

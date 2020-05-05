@@ -9,3 +9,4 @@
 * Implemented sprite working version including extensive testing
 * Implemented binary check
 * Renamed functions to check_*, which makes more sense than the name of the technique
+* copied improvement / bugfix from rSprite version 2019
